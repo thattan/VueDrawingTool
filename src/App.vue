@@ -1,14 +1,5 @@
 <template>
-  <!DOCTYPE html>
-  <html>
 
-  <head>
-    <title>Drawing Tool</title>
-    <!-- <script src="../hystModal-0.4/src/hystmodal.min.js"></script> -->
-    <link href="/app.scss" rel="stylesheet/scss" type="text/css">
-  </head>
-
-  <body>
     <div class="header">
       <div class="float-left">
         <div class="float-left">
@@ -22,7 +13,7 @@
         <button id="finalizeBtn">Finalize & Get a Quote</button>
       </div>
     </div>
-    <div class="hystmodal" id="myModal" aria-hidden="true">
+    <!-- <div class="hystmodal" id="myModal" aria-hidden="true">
       <div class="hystmodal__wrap">
         <div class="loading__window modal_window" role="dialog" aria-modal="true">
           <div class="loading-text">
@@ -57,7 +48,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <div id="container">
       <div class="drawing">
@@ -215,42 +206,91 @@
       <!-- <div data-tg-tour="<span>My first tour</span>"> ... </div> -->
 
     </div>
-  </body>
-
-  </html>
 </template>
 
 <script>
 //import HelloWorld from './components/HelloWorld.vue'
-import test from './drawingfunctions.js';
+import drawingFunctions from './js/drawingfunctions.js';
+import grid from './js/grid.js';
+import { fabric } from "fabric";
 
 export default {
   name: 'App',
   data() {
     return {
+      // base tool
+      canvas: null,
+      drawingMode: '',
+      lineOrientation: '',
+
+      calloutNumber: 1,
+
+      // temp variable for objects being drawn
+      line: new fabric.Line(),
+      rectangle: new fabric.Rect(),
+      circle: new fabric.Circle(),
+
+      inDrawingMode: '',
+      isDrawing: false,
+
+      connectCircles: [],
+      connectLines: [],
       
+      lineCircle: {
+        x: 0,
+        y: 0,
+        isInCircle: false
+      },
+
+      lineCircleSize: 16,
+      dontDrawStartCircle: false,
+      dontDrawEndCircle: false,
+
+      currentLineTextbox: null
     }
   },
+
   mounted() {
-    //test.testfunc();
+    this.canvas = new fabric.Canvas('c', {
+      selection: true,
+      preserveObjectStacking: true
+    });
+
+    // this.drawingMode = drawingMode;
+    // this.lineOrientations = lineOrientations;
+
+    fabric.Object.prototype.transparentCorners = false;
+
+    drawingFunctions.foo();
+
+    this.canvas.isDrawingMode = true;
+    this.canvas.freeDrawingBrush.width = 5;
+
+    grid.setGrid(this.canvas, require('../public/grid.png'));
+    //this.canvas.setBackgroundImage(require('../assets/grid.png'), () => {}, { objectCaching: false });
+
+    this.resizeCanvas(); 
   },
+
   created() {
-    //const test = require('./drawingfunctions.js');
-    test.foo();
+    // selection should allow a user to drag over objects to select them
+
+    //this.canvas.initState();
+  },
+
+  methods: {
+    resizeCanvas() {
+
+        const container = document.getElementsByClassName('drawing')[0];
+        const canvasContainer = container.getElementsByClassName('canvas-container')[0];
+        canvasContainer.style.width = 'unset';
+        canvasContainer.style.height = 'unset';
+        this.canvas.setDimensions({ width: container.offsetWidth, height: container.offsetHeight });
+    }
   }
 }
 </script>
 
-<style>
-#app {
-  /* font-family: Avenir, Helvetica, Arial, sans-serif; */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  /* text-align: center; */
-  color: #2c3e50;
-  /* margin-top: 60px; */
-}
-</style>
 <style lang="scss" scoped>
-  @import "app.scss"; //Here i add extra "./"(current directory)
+@import "app.scss";
 </style>
