@@ -59,7 +59,7 @@
         <div class="tool"
           data-tg-tour='The final step<br> <img src="b6e5ff47724ef4eb6a69.svg" height="500" width="500">'
           data-tg-order="99">
-          <div class="tool-item" id="pan">
+          <div class="tool-item" id="pan" @click="changeDrawingMode()">
             <img :src="require('../assets/pan.svg')" width="24" height="24">
             <div>Pan</div>
           </div>
@@ -266,10 +266,9 @@ export default {
 
     fabric.Object.prototype.transparentCorners = false;
 
-    drawingFunctions.foo();
 
-    this.canvas.isDrawingMode = true;
-    this.canvas.freeDrawingBrush.width = 5;
+    // this.canvas.isDrawingMode = true;
+    // this.canvas.freeDrawingBrush.width = 5;
 
     //grid.setGrid(this.canvas, require('../public/grid.png'));
     //this.canvas.setBackgroundImage(require('../assets/grid.png'), () => {}, { objectCaching: false });
@@ -432,7 +431,7 @@ export default {
           })
         }
 
-        this.recalculate(this.canvas);
+        drawingFunctions.recalculate(this.canvas);
       } else {
         if (this.inDrawingMode == type.drawingMode.CONNECT) {
           // loop over cirlces to see if cursor is over it
@@ -492,7 +491,7 @@ export default {
         this.line.setCoords();
         this.isDrawing = false;
         this.makeObjectsNotSelectable(this.canvas);
-        this.canvas.saveState();
+        //this.canvas.saveState();
       }
 
       if (this.inDrawingMode == type.drawingMode.CONNECT) {
@@ -549,19 +548,19 @@ export default {
           this.canvas.remove(this.currentLineTextbox);
         }
 
-        this.canvas.saveState();
+        //this.canvas.saveState();
       }
 
       if (this.inDrawingMode == type.drawingMode.RECTANGLE) {
         this.rectangle.setCoords();
         this.isDrawing = false;
         this.makeObjectsNotSelectable(this.canvas);
-        this.canvas.saveState();
+        //this.canvas.saveState();
       } else if (this.inDrawingMode == type.drawingMode.CIRCLE) {
         this.circle.setCoords();
         this.isDrawing = false;
         this.makeObjectsNotSelectable(this.canvas);
-        this.canvas.saveState();
+        //this.canvas.saveState();
       }
     },
 
@@ -693,49 +692,50 @@ export default {
       this.canvas.renderAll();
     },
 
-    recalculate() {
-      const lines = this.canvas.getObjects('line');
+    // recalculate(canvas) {
+    //   const lines = canvas.getObjects('line');
 
-      lines.forEach(function (line) {
+    //   lines.forEach(function (line) {
 
-        //line.hasOwnProperty('lineLength')
-        if (Object.prototype.hasOwnProperty.call(line, 'lineLength')) {
-          var length = Math.round(Math.sqrt((line.width * line.width) + (line.height * line.height)) / 10);
+    //     //line.hasOwnProperty('lineLength')
+    //     if (Object.prototype.hasOwnProperty.call(line, 'lineLength')) {
+    //       var length = Math.round(Math.sqrt((line.width * line.width) + (line.height * line.height)) / 10);
 
-          //move the measure boxes in the middle of the line and show the line length in feet on the cooresponding fence lines
-          var lineSize = this.canvas.getItemByName(line.lineLength);
+    //       console.log('recalc', line, line.lineLength, canvas)
+    //       //move the measure boxes in the middle of the line and show the line length in feet on the cooresponding fence lines
+    //       var lineSize = canvas.getItemByName(line.lineLength);
 
-          if (lineSize) {
-            const lineCoords = this.getLineCoords(line);
-            const perpAngle = (this.calcAngle({ x: lineCoords.x1, y: lineCoords.y1 }, { x: lineCoords.x2, y: lineCoords.y2 }) + 90) * Math.PI / 180;
-            const startPoint = {
-              x: lineCoords.x1 + ((lineCoords.x2 - lineCoords.x1) / 2),
-              y: lineCoords.y1 + ((lineCoords.y2 - lineCoords.y1) / 2)
-            };
+    //       if (lineSize) {
+    //         const lineCoords = this.getLineCoords(line);
+    //         const perpAngle = (this.calcAngle({ x: lineCoords.x1, y: lineCoords.y1 }, { x: lineCoords.x2, y: lineCoords.y2 }) + 90) * Math.PI / 180;
+    //         const startPoint = {
+    //           x: lineCoords.x1 + ((lineCoords.x2 - lineCoords.x1) / 2),
+    //           y: lineCoords.y1 + ((lineCoords.y2 - lineCoords.y1) / 2)
+    //         };
 
-            const newPoint = {
-              x: startPoint.x + 25 * Math.cos(perpAngle),
-              y: startPoint.y + 25 * Math.sin(perpAngle),
-            }
+    //         const newPoint = {
+    //           x: startPoint.x + 25 * Math.cos(perpAngle),
+    //           y: startPoint.y + 25 * Math.sin(perpAngle),
+    //         }
 
-            lineSize.set({
-              left: newPoint.x,
-              top: newPoint.y,
-              originX: 'center',
-              originY: 'center'
-            });
+    //         lineSize.set({
+    //           left: newPoint.x,
+    //           top: newPoint.y,
+    //           originX: 'center',
+    //           originY: 'center'
+    //         });
 
-            //the user edited the length so use their number
-            if (lineSize.get('state') == 'edited') {
-              length = parseInt(lineSize.get('text'));
-            }
+    //         //the user edited the length so use their number
+    //         if (lineSize.get('state') == 'edited') {
+    //           length = parseInt(lineSize.get('text'));
+    //         }
 
-            lineSize.set('text', length.toString());
-            lineSize.setCoords();
-          }
-        }
-      });
-    },
+    //         lineSize.set('text', length.toString());
+    //         lineSize.setCoords();
+    //       }
+    //     }
+    //   });
+    // },
 
     getLineCoords(line) {
       const points = line.calcLinePoints();
@@ -811,6 +811,12 @@ export default {
         this.connectLines.push(this.line);
 
         this.currentLineTextbox = lineSize;
+    },
+
+    changeDrawingMode() {
+      this.inDrawingMode = type.drawingMode.CONNECT;
+      this.lineOrientation = type.lineOrientations.NONE;
+      this.makeObjectsNotSelectable();
     }
   }
 }
