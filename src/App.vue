@@ -59,43 +59,43 @@
         <div class="tool"
           data-tg-tour='The final step<br> <img src="b6e5ff47724ef4eb6a69.svg" height="500" width="500">'
           data-tg-order="99">
-          <div class="tool-item" id="pan" @click="changeDrawingMode()">
+          <div class="tool-item" id="pan" @click="panMode($event)">
             <img :src="require('../assets/pan.svg')" width="24" height="24">
             <div>Pan</div>
           </div>
         </div>
         <div class="tool">
-          <div class="tool-item" id="select">
+          <div class="tool-item" id="select" @click="selectMode()">
             <img :src="require('../assets/select.svg')" width="24" height="24">
             <div>Select</div>
           </div>
         </div>
         <div class="tool">
-          <div class="tool-item" id="connect">
+          <div class="tool-item" id="connect" @click="changeDrawingMode('CONNECT')">
             <img :src="require('../assets/diagonal-line.svg')" width="24" height="24">
-            <div>Surface</div>
+            <div>Line</div>
           </div>
         </div>
         <div class="tool">
-          <div class="tool-item" id="drawcircle">
+          <div class="tool-item" id="drawcircle" @click="changeDrawingMode('CIRCLE')">
             <img :src="require('../assets/circle.svg')" width="24" height="24">
             <div>Circle</div>
           </div>
         </div>
         <div class="tool">
-          <div class="tool-item" id="drawrectangle">
+          <div class="tool-item" :class="{ 'selected-tool': inDrawingMode === 'rectangle' }" id="drawrectangle" @click="changeDrawingMode('RECTANGLE')">
             <img :src="require('../assets/rectangle.svg')" width="24" height="24">
             <div>Square</div>
           </div>
         </div>
         <div class="tool">
-          <div class="tool-item" id="delete">
+          <div class="tool-item" id="delete" @click="deleteItem()">
             <img :src="require('../assets/trash.svg')" width="24" height="24">
             <div>Delete</div>
           </div>
         </div>
         <div class="tool">
-          <div class="tool-item" id="notes">
+          <div class="tool-item" id="notes" @click="addNote()">
             <img :src="require('../assets/note.svg')" width="24" height="24">
             <div>Note</div>
           </div>
@@ -692,6 +692,14 @@ export default {
       this.canvas.renderAll();
     },
 
+    makeObjectsSelectable() {
+      this.canvas.selection = true;
+      this.canvas.forEachObject(function (o) {
+        o.selectable = true;
+      });
+      this.canvas.renderAll();
+    },
+
     // recalculate(canvas) {
     //   const lines = canvas.getObjects('line');
 
@@ -753,70 +761,115 @@ export default {
     },
 
     createConnectLine(points) {
-        var lineSize = new fabric.Textbox('', {
-            name: 'test',
-            fontSize: 26,
-            fontFamily: 'sans-serif',
-            lineHeight: 1,
-            originX: 'center',
-            originY: 'center',
-            textAlign: 'center',
-            borderColor: '#999999',
-            padding: 0,
-            textBackgroundColor: 'transparent',
-            hoverCursor: 'default',
-            width: 100,
-            height: 20,
-            lockMovementX: true,
-            lockMovementY: true,
-            lockScalingX: true,
-            lockScalingY: true
-        });
-        
-        lineSize.set('toObjectType', 'fenceSizeBox');                
+      var lineSize = new fabric.Textbox('', {
+        name: 'test',
+        fontSize: 26,
+        fontFamily: 'sans-serif',
+        lineHeight: 1,
+        originX: 'center',
+        originY: 'center',
+        textAlign: 'center',
+        borderColor: '#999999',
+        padding: 0,
+        textBackgroundColor: 'transparent',
+        hoverCursor: 'default',
+        width: 100,
+        height: 20,
+        lockMovementX: true,
+        lockMovementY: true,
+        lockScalingX: true,
+        lockScalingY: true
+      });
 
-        this.line = new fabric.Line(points, {
-            isFence: true,
-            stroke: 'black',
-            //name: 'fenceSegment' + segmentId,
-            // orientation: orientation,
-            drawnDirection: 'none',
-            //fenceType: fType,
-            perPixelTargetFind: true,
-            strokeWidth: 5,
-            //hasBorders: false,
-            //lockScalingX: true,
-            //lockScalingY: true,
-            strokeUniform: true,
-            lockSkewingX: true,
-            lockSkewingY: true,
-            hoverCursor: 'crosshair',
-            lineLength: lineSize.name
-        });
+      lineSize.set('toObjectType', 'fenceSizeBox');
 
-        //this.line.set('toObjectType', 'fence');
+      this.line = new fabric.Line(points, {
+        isFence: true,
+        stroke: 'black',
+        //name: 'fenceSegment' + segmentId,
+        // orientation: orientation,
+        drawnDirection: 'none',
+        //fenceType: fType,
+        perPixelTargetFind: true,
+        strokeWidth: 5,
+        //hasBorders: false,
+        //lockScalingX: true,
+        //lockScalingY: true,
+        strokeUniform: true,
+        lockSkewingX: true,
+        lockSkewingY: true,
+        hoverCursor: 'crosshair',
+        lineLength: lineSize.name
+      });
 
-        lineSize.set({
-            left: this.line.left - 5,
-            top: this.line.top - 5,
-        });
-        
-        lineSize.setCoords();
+      //this.line.set('toObjectType', 'fence');
 
-        this.line.set('toObjectType', 'line');
+      lineSize.set({
+        left: this.line.left - 5,
+        top: this.line.top - 5,
+      });
 
-        this.canvas.add(this.line);
-        this.canvas.add(lineSize);
+      lineSize.setCoords();
 
-        this.connectLines.push(this.line);
+      this.line.set('toObjectType', 'line');
 
-        this.currentLineTextbox = lineSize;
+      this.canvas.add(this.line);
+      this.canvas.add(lineSize);
+
+      this.connectLines.push(this.line);
+
+      this.currentLineTextbox = lineSize;
     },
 
-    changeDrawingMode() {
-      this.inDrawingMode = type.drawingMode.CONNECT;
-      this.lineOrientation = type.lineOrientations.NONE;
+    changeDrawingMode(drawingMode) {
+      this.inDrawingMode = type.drawingMode[drawingMode];
       this.makeObjectsNotSelectable();
+    },
+
+    deleteItem() {
+      this.inDrawingMode = type.drawingMode.NONE;
+      drawingFunctions.deleteSelected(this.canvas);
+    },
+
+    addNote() {
+      this.inDrawingMode = type.drawingMode.NONE;
+
+      var note = new fabric.Textbox('', {
+        fill: 'black',
+        fontSize: 16,
+        fontFamily: 'Arial',
+        lineHeight: 1,
+        borderColor: 'black',
+        padding: 1,
+        textBackgroundColor: 'white',
+        hoverCursor: 'default',
+        width: 200,
+        height: 100,
+        lockScalingX: false,
+        lockScalingY: false,
+        lockUniScaling: false,
+        lockSkewingX: true,
+        lockSkewingY: true,
+        top: 30,
+        left: 30,
+        backgroundColor: 'white',
+        text: 'Note:'
+      });
+
+      this.canvas.add(note);
+      //this.canvas.saveState();
+    },
+
+    selectMode() {
+      this.inDrawingMode = type.drawingMode.NONE;
+      this.makeObjectsSelectable();
+    },
+
+    panMode(e) {
+      e.preventDefault();
+      this.inDrawingMode = type.drawingMode.PAN;
+      this.canvas.discardActiveObject();
+      this.makeObjectsNotSelectable(this.canvas);
     }
   }
 }

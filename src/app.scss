@@ -107,7 +107,7 @@ input {
 #finalizeBtn {
     margin-top: 6px;
     margin-right: 10px;
-    background-color: #B80F0F;
+    background-color: hsl(87deg, 67%, 45%);
     color: white;
     width: 246px;
     height: 48px;
@@ -280,23 +280,6 @@ input {
     clear: both;
     padding: 10px;
     color: black;
-}
-
-button#finalize {
-    position: absolute;
-    right: 20px;
-    bottom: 20px;
-    background-color: #dd3b12;
-    border: none;
-    color: white;
-    padding: 20px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 15px;
-    margin: 4px 2px;
-    z-index: 1000;
-    cursor: pointer;
 }
 
 button:hover {

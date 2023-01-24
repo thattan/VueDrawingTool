@@ -29,6 +29,16 @@ function calcAngle(a, b) {
   return theta * (180 / Math.PI);
 }
 
+function deleteCallout(groupName, _canvas) {
+  _canvas.forEachObject(function (o) {
+    if (typeof o !== 'undefined') {
+      if (Object.prototype.hasOwnProperty.call(o, 'groupName') && o.groupName == groupName) {
+        _canvas.remove(o);
+      }
+    }
+  });
+}
+
 var drawingFunctions = {
   // Gets the size of the drawing to make the image the right size
   getDrawingBounds(_canvas, legendPadding) {
@@ -113,35 +123,25 @@ var drawingFunctions = {
   },
 
   //delete the selected objects
-  // deleteSelected(_canvas) {
-  //   _canvas.getActiveObjects().forEach((obj) => {
+  deleteSelected(_canvas) {
+    _canvas.getActiveObjects().forEach((obj) => {
 
-  //     //there are lots of objects in a callout so remove them all
-  //     if (obj.hasOwnProperty('name') && obj.name.substring(0, 7) == 'callout') {
-  //       deleteCallout(obj.groupName);
-  //     };
+      //there are lots of objects in a callout so remove them all
+      if (Object.prototype.hasOwnProperty.call(obj, 'name') && obj.name.substring(0, 7) == 'callout') {
+        deleteCallout(obj.groupName, _canvas);
+      }
 
-  //     //dont let user remove textbox that shows measurements for lines and gates
-  //     if (obj.type === 'textbox' && obj.hasOwnProperty('name')) {
-  //       return;
-  //     };
+      //dont let user remove textbox that shows measurements for lines and gates
+      if (obj.type === 'textbox' && Object.prototype.hasOwnProperty.call(obj, 'name')) {
+        return;
+      }
 
-  //     _canvas.remove(obj);
-  //   });
+      _canvas.remove(obj);
+    });
 
-  //   recalculate(_canvas);
-  //   _canvas.discardActiveObject().renderAll();
-  // },
-
-  // deleteCallout(groupName) {
-  //   _canvas.forEachObject(function (o) {
-  //     if (typeof o !== 'undefined') {
-  //       if (o.hasOwnProperty('groupName') && o.groupName == groupName) {
-  //         _canvas.remove(o);
-  //       };
-  //     };
-  //   });
-  // },
+    //recalculate(_canvas);
+    _canvas.discardActiveObject().renderAll();
+  },
 
   //do this so you don't move objects while drawing
   makeObjectsNotSelectable(_canvas) {
