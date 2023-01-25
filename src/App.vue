@@ -10,6 +10,7 @@
       </div>
     </div>
     <div class="float-right">
+      <button id="homeBtn">Home</button>
       <button id="finalizeBtn">Finalize & Get a Quote</button>
     </div>
   </div>
