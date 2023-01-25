@@ -3,7 +3,7 @@
   <div class="header">
     <div class="float-left">
       <div class="float-left" id="logo">
-        <img :src="require('../assets/logo.svg')" width="125" height="61" >
+        <img :src="require('../assets/logo.svg')" width="125" height="61">
       </div>
       <div class="float-right border-left" style="height: 61px;">
         <h1 id="header-text"></h1>
@@ -65,25 +65,29 @@
           </div>
         </div>
         <div class="tool">
-          <div class="tool-item" :class="{ 'selected-tool': inDrawingMode === 'none' }" id="select" @click="selectMode()">
+          <div class="tool-item" :class="{ 'selected-tool': inDrawingMode === 'none' }" id="select"
+            @click="selectMode()">
             <img :src="require('../assets/select.svg')" width="24" height="24">
             <div>Select</div>
           </div>
         </div>
         <div class="tool">
-          <div class="tool-item" :class="{ 'selected-tool': inDrawingMode === 'connect' }" id="connect" @click="changeDrawingMode('CONNECT')">
+          <div class="tool-item" :class="{ 'selected-tool': inDrawingMode === 'connect' }" id="connect"
+            @click="changeDrawingMode('CONNECT')">
             <img :src="require('../assets/diagonal-line.svg')" width="24" height="24">
             <div>Line</div>
           </div>
         </div>
         <div class="tool">
-          <div class="tool-item" :class="{ 'selected-tool': inDrawingMode === 'circle' }" id="drawcircle" @click="changeDrawingMode('CIRCLE')">
+          <div class="tool-item" :class="{ 'selected-tool': inDrawingMode === 'circle' }" id="drawcircle"
+            @click="changeDrawingMode('CIRCLE')">
             <img :src="require('../assets/circle.svg')" width="24" height="24">
             <div>Circle</div>
           </div>
         </div>
         <div class="tool">
-          <div class="tool-item" :class="{ 'selected-tool': inDrawingMode === 'rectangle' }" id="drawrectangle" @click="changeDrawingMode('RECTANGLE')">
+          <div class="tool-item" :class="{ 'selected-tool': inDrawingMode === 'rectangle' }" id="drawrectangle"
+            @click="changeDrawingMode('RECTANGLE')">
             <img :src="require('../assets/rectangle.svg')" width="24" height="24">
             <div>Square</div>
           </div>
@@ -101,7 +105,7 @@
           </div>
         </div>
         <div class="tool">
-          <div class="tool-item" id="compass">
+          <div class="tool-item" id="compass" @click="addCompass()">
             <img :src="require('../assets/compass.svg')" width="24" height="24">
             <div>Compass</div>
           </div>
@@ -138,7 +142,8 @@
       </div>
       <div class="library-items-container" id="landscape-items">
         <div class="library-item" id="tree">
-          <img class="float-left" :src="require('../assets/TreeThumbnail.png')" width="45" height="45">
+          <img class="float-left" :src="require('../assets/TreeThumbnail.png')" width="45" height="45"
+            @dragstart="dragStartImage()">
           <div class="float-right library-item-text">Tree</div>
         </div>
         <div class="library-item" id="shrub">
@@ -195,7 +200,9 @@ export default {
       dontDrawStartCircle: false,
       dontDrawEndCircle: false,
 
-      currentLineTextbox: null
+      currentLineTextbox: null,
+
+      currentImageDrag: require('../assets/TreeThumbnail.png')
     }
   },
 
@@ -239,6 +246,23 @@ export default {
 
     this.canvas.on('mouse:up', function () {
       that.mouseUp(this);
+    });
+
+    // drag and drop http://jsfiddle.net/Ahammadalipk/w8kkc/185/
+    this.canvas.on('dragenter', function () {
+      console.log('dragenter');
+    });
+
+    this.canvas.on('dragover', function (e) {
+      that.dragover(e);
+    });
+
+    this.canvas.on('dragleave', function () {
+      console.log('dragleave');
+    });
+
+    this.canvas.on('drop', function (e) {
+      that.drop(e);
     });
   },
 
@@ -816,6 +840,56 @@ export default {
       this.inDrawingMode = type.drawingMode.PAN;
       this.canvas.discardActiveObject();
       this.makeObjectsNotSelectable(this.canvas);
+    },
+
+    addCompass() {
+
+    },
+
+    dragenter() {
+
+    },
+
+    dragover(e) {
+      if (e.preventDefault) {
+        e.preventDefault(); // Necessary. Allows us to drop.
+      }
+
+      //e.dataTransfer.dropEffect = 'copy'; // See the section on the DataTransfer object.
+      // NOTE: comment above refers to the article (see top) -natchiketa
+
+      return false;
+    },
+
+    dragleave() {
+
+    },
+
+    drop(e) {
+      if (e.stopPropagation) {
+        e.stopPropagation(); // stops the browser from redirecting.
+      }
+
+      var img = document.querySelector('#treepng');
+
+      console.log('event: ', e);
+
+      var newImage = new fabric.Image(img, {
+        width: img.width,
+        height: img.height,
+        // Set the center of the new object based on the event coordinates relative
+        // to the canvas container.
+        left: 0,
+        top: 0
+      });
+
+      this.canvas.add(newImage);
+
+      return false;
+    },
+
+    dragStartImage() {
+      //this.currentImageDrag
     }
   }
 }
