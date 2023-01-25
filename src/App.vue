@@ -2,11 +2,11 @@
 
   <div class="header">
     <div class="float-left">
-      <div class="float-left">
-        <img :src="require('../assets/logo.svg')" width="125" height="61">
+      <div class="float-left" id="logo">
+        <img :src="require('../assets/logo.svg')" width="125" height="61" >
       </div>
       <div class="float-right border-left" style="height: 61px;">
-        <h1 id="header-text">Playground Drawing Tool</h1>
+        <h1 id="header-text"></h1>
       </div>
     </div>
     <div class="float-right">
@@ -65,19 +65,19 @@
           </div>
         </div>
         <div class="tool">
-          <div class="tool-item" id="select" @click="selectMode()">
+          <div class="tool-item" :class="{ 'selected-tool': inDrawingMode === 'none' }" id="select" @click="selectMode()">
             <img :src="require('../assets/select.svg')" width="24" height="24">
             <div>Select</div>
           </div>
         </div>
         <div class="tool">
-          <div class="tool-item" id="connect" @click="changeDrawingMode('CONNECT')">
+          <div class="tool-item" :class="{ 'selected-tool': inDrawingMode === 'connect' }" id="connect" @click="changeDrawingMode('CONNECT')">
             <img :src="require('../assets/diagonal-line.svg')" width="24" height="24">
             <div>Line</div>
           </div>
         </div>
         <div class="tool">
-          <div class="tool-item" id="drawcircle" @click="changeDrawingMode('CIRCLE')">
+          <div class="tool-item" :class="{ 'selected-tool': inDrawingMode === 'circle' }" id="drawcircle" @click="changeDrawingMode('CIRCLE')">
             <img :src="require('../assets/circle.svg')" width="24" height="24">
             <div>Circle</div>
           </div>
@@ -128,68 +128,12 @@
     </div>
 
     <div id="right-sidebar">
-      <div class="library">
+      <!-- <div class="library">
         <div id="right-sidebar-header">PLAYGROUND LIBRARIES</div>
-      </div>
-
-      <div class="library" data-dropdown="equipment">
-        <div id="right-sidebar-header">Equipment</div>
-        <img :src="require('../assets/arrow_drop_down.svg')" width="24" height="24">
-      </div>
-      <div class="library-items-container hide" id="equipment-items">
-        <div class="library-item equipment">
-          <img class="float-left" :src="require('../assets/TreeThumbnail.png')" width="45" height="45">
-          <div class="float-right library-item-text">Tree</div>
-        </div>
-        <div class="library-item">
-          <img class="float-left" :src="require('../assets/ShrubThumbnail.png')" width="45" height="45">
-          <div class="float-right library-item-text">Bush</div>
-        </div>
-      </div>
-
-      <div class="library" data-dropdown="bench">
-        <div id="right-sidebar-header">Benches</div>
-        <img :src="require('../assets/arrow_drop_down.svg')" width="24" height="24">
-      </div>
-      <div class="library-items-container hide" id="bench-items">
-        <div class="library-item">
-          <img class="float-left" :src="require('../assets/TreeThumbnail.png')" width="45" height="45">
-          <div class="float-right library-item-text">Tree</div>
-        </div>
-        <div class="library-item">
-          <img class="float-left" :src="require('../assets/ShrubThumbnail.png')" width="45" height="45">
-          <div class="float-right library-item-text">Bush</div>
-        </div>
-      </div>
-
-      <div class="library" data-dropdown="shade">
-        <div id="right-sidebar-header">Shade Screens</div>
-        <img :src="require('../assets/arrow_drop_down.svg')" width="24" height="24">
-      </div>
-      <div class="library-items-container hide" id="shade-items">
-        <div class="library-item">
-          <img class="float-left" :src="require('../assets/TreeThumbnail.png')" width="45" height="45">
-          <div class="float-right library-item-text">Tree</div>
-        </div>
-        <div class="library-item">
-          <img class="float-left" :src="require('../assets/ShrubThumbnail.png')" width="45" height="45">
-          <div class="float-right library-item-text">Bush</div>
-        </div>
-      </div>
-
-      <div class="library" data-dropdown="surface">
-        <div id="right-sidebar-header">Surface Hatch</div>
-        <img :src="require('../assets/arrow_drop_down.svg')" width="24" height="24">
-      </div>
-      <div class="library-items-container hide" id="surface-items">
-        <div class="library-item" id="polygon">
-          <img class="float-left" :src="require('../assets/TreeThumbnail.png')" width="45" height="45">
-          <div class="float-right library-item-text">Purple Surface</div>
-        </div>
-      </div>
+      </div> -->
 
       <div class="library" data-dropdown="landscape">
-        <div id="right-sidebar-header">Landscape</div>
+        <div id="right-sidebar-header">Add To Drawing</div>
         <img :src="require('../assets/arrow_drop_down.svg')" width="24" height="24">
       </div>
       <div class="library-items-container" id="landscape-items">
@@ -275,6 +219,8 @@ export default {
 
     this.resizeCanvas();
     window.addEventListener('resize', this.resizeCanvas());
+
+    this.lineOrientation = type.lineOrientations.NONE;
 
     const that = this;
 
@@ -431,7 +377,7 @@ export default {
           })
         }
 
-        drawingFunctions.recalculate(this.canvas);
+        drawingFunctions.recalculate(this.canvas, this.line);
       } else {
         if (this.inDrawingMode == type.drawingMode.CONNECT) {
           // loop over cirlces to see if cursor is over it

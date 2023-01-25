@@ -166,11 +166,11 @@ var drawingFunctions = {
   },
 
   //move fence label with the line and calculate while line moves
-  recalculate(_canvas) {
+  recalculate(_canvas, line) {
 
-    var lines = _canvas.getObjects('line');
+    // var lines = _canvas.getObjects('line');
 
-    lines.forEach(function (line) {
+    // lines.forEach(function (line) {
 
       //line.hasOwnProperty('lineLength')
       if (Object.prototype.hasOwnProperty.call(line, 'lineLength')) {
@@ -206,7 +206,8 @@ var drawingFunctions = {
           lineSize.setCoords();
         }
       }
-    });
+    //   }
+    // });
   },
 
   //makes it easier to edit textboxes for lines and gates
