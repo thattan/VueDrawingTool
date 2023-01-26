@@ -10,7 +10,7 @@
       </div>
     </div>
     <div class="float-right">
-      <button id="homeBtn">Home</button>
+      <button id="homeBtn" @click="homeClick()">Home</button>
       <button id="finalizeBtn">Finalize & Get a Quote</button>
     </div>
   </div>
@@ -50,8 +50,10 @@
         </div>
       </div>
     </div> -->
+  <div v-show="showDrawing == false" style="border: solid 1px #ccc; height: 360px; margin: 1em 0; text-align: center; border-radius: 4px;" id="map"
+    class="map"></div>
 
-  <div id="container">
+  <div id="container" v-show="showDrawing">
     <div class="drawing">
       <canvas id="c"></canvas>
     </div>
@@ -171,6 +173,8 @@ export default {
     return {
       // base tool
       canvas: null,
+      showDrawing: true,
+
       drawingMode: '',
       lineOrientation: '',
 
@@ -230,9 +234,21 @@ export default {
 
     this.lineOrientation = type.lineOrientations.NONE;
 
+    
+    // var scripts = [
+    //   "https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&v=weekly"
+    // ];
+    // scripts.forEach(script => {
+    //   let tag = document.createElement("script");
+    //   tag.setAttribute("src", script);
+    //   document.head.appendChild(tag);
+    // });
+
+
+
     const that = this;
 
-    fabric.Image.fromURL(require('../public/grid.png'), function (Image) {
+    fabric.Image.fromURL(require('../assets/grid.png'), function (Image) {
       that.canvas.setBackgroundImage(Image);
       that.canvas.renderAll();
     })
@@ -271,6 +287,7 @@ export default {
     // selection should allow a user to drag over objects to select them
 
     //this.canvas.initState();
+
   },
 
   methods: {
@@ -891,11 +908,23 @@ export default {
 
     dragStartImage() {
       //this.currentImageDrag
+    },
+
+    homeClick() {
+      this.showDrawing = !this.showDrawing;
+      const latlong = new google.maps.LatLng(41.2645421, -95.9716378);
+      const map = new google.maps.Map(document.getElementById('map'), {
+        center: latlong,
+        zoom: 20,
+        tilt: 0,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        scrollwheel: false,
+        mapTypeId: "satellite"
+    });
     }
   }
 }
 </script>
-
 <style lang="scss" scoped>
 @import "app.scss";
 </style>
