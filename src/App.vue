@@ -50,7 +50,8 @@
         </div>
       </div>
     </div> -->
-  <div v-show="showDrawing == false" style="border: solid 1px #ccc; height: 360px; margin: 1em 0; text-align: center; border-radius: 4px;" id="map"
+  <div v-show="showDrawing == false"
+    style="border: solid 1px #ccc; height: 360px; margin: 1em 0; text-align: center; border-radius: 4px;" id="map"
     class="map"></div>
 
   <div id="container" v-show="showDrawing">
@@ -144,14 +145,9 @@
         <img :src="require('../assets/arrow_drop_down.svg')" width="24" height="24">
       </div>
       <div class="library-items-container" id="landscape-items">
-        <div class="library-item" id="tree">
-          <img class="float-left" :src="require('../assets/TreeThumbnail.png')" width="45" height="45"
-            @dragstart="dragStartImage()">
-          <div class="float-right library-item-text">Tree</div>
-        </div>
-        <div class="library-item" id="shrub">
-          <img class="float-left" :src="require('../assets/ShrubThumbnail.png')" width="45" height="45">
-          <div class="float-right library-item-text">Bush</div>
+        <div class="library-item" v-for="item in imageList" @click="addImage(item.name)">
+          <img class="float-left" :src="item.src" width="45" height="45" @dragstart="dragStartImage()">
+          <div class="float-right library-item-text">{{ item.name }}</div>
         </div>
       </div>
     </div>
@@ -166,6 +162,7 @@ import drawingFunctions from './js/drawingfunctions.js';
 import type from './js/types.js';
 //import grid from './js/grid.js';
 import { fabric } from "fabric";
+import imageList from './js/images.js';
 
 export default {
   name: 'App',
@@ -174,6 +171,8 @@ export default {
       // base tool
       canvas: null,
       showDrawing: true,
+
+      imageList: [],
 
       drawingMode: '',
       lineOrientation: '',
@@ -234,7 +233,7 @@ export default {
 
     this.lineOrientation = type.lineOrientations.NONE;
 
-    
+
     // var scripts = [
     //   "https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&v=weekly"
     // ];
@@ -244,7 +243,8 @@ export default {
     //   document.head.appendChild(tag);
     // });
 
-
+    this.imageList = imageList;
+    console.log('image list', imageList)
 
     const that = this;
 
@@ -920,7 +920,28 @@ export default {
         mapTypeId: google.maps.MapTypeId.ROADMAP,
         scrollwheel: false,
         mapTypeId: "satellite"
-    });
+      });
+    },
+
+    addImage(name) {
+      const image = imageList.find(x => x.name === name);
+
+      this.inDrawingMode = type.drawingMode.NONE;
+
+      const that = this;
+
+      fabric.Image.fromURL(image.src, function (oImg) {
+        oImg.set({
+          left: (200),
+          top: (100),
+          readOut: {
+            imagetype: image.name
+          }
+        });
+
+        that.canvas.add(oImg);
+        //that.canvas.saveState();
+      });
     }
   }
 }
