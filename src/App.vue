@@ -128,7 +128,7 @@
         </div>
         <div class="tool">
           <div class="tool-item" id="redo">
-            <img :src="require('../assets/redo.svg')" width="24" height="24">
+            <img :src="require('../assets/redo.svg')" width="24" height="24" @click="freeDraw()">
             <div>Redo</div>
           </div>
         </div>
@@ -229,7 +229,7 @@ export default {
     //this.canvas.setBackgroundImage(require('../assets/grid.png'), () => {}, { objectCaching: false });
 
     this.resizeCanvas();
-    window.addEventListener('resize', this.resizeCanvas());
+    //window.addEventListener('resize', this.resizeCanvas());
 
     this.lineOrientation = type.lineOrientations.NONE;
 
@@ -287,17 +287,26 @@ export default {
     // selection should allow a user to drag over objects to select them
 
     //this.canvas.initState();
+    //window.addEventListener("resize", this.resizeCanvas());
 
   },
 
   methods: {
+    addCanvasResize() {
+      // try this? or kms
+      //https://www.nightprogrammer.com/vue-js/how-to-detect-screen-width-and-update-it-on-resize-in-vue-js-example/
+    },
+
     resizeCanvas() {
-      console.log('resize')
-      const container = document.getElementsByClassName('drawing')[0];
+      console.log('resize', document.getElementsByClassName('drawing'));
+
+      if (document.getElementsByClassName('drawing').length > 0) {
+        const container = document.getElementsByClassName('drawing')[0];
       const canvasContainer = container.getElementsByClassName('canvas-container')[0];
       canvasContainer.style.width = 'unset';
       canvasContainer.style.height = 'unset';
       this.canvas.setDimensions({ width: container.offsetWidth, height: container.offsetHeight });
+      }      
     },
 
     mouseMove(e, that) {
@@ -494,7 +503,7 @@ export default {
               opacity: 0.5,
               radius: this.lineCircleSize,
               fill: 'transparent',
-              stroke: '#666',
+              // stroke: '#666',
               perPixelTargetFind: true,
               selectable: false
             });
@@ -514,7 +523,7 @@ export default {
               opacity: 0.5,
               radius: this.lineCircleSize,
               fill: 'transparent',
-              stroke: '#666',
+              //stroke: '#666',
               perPixelTargetFind: true,
               selectable: false
             });
@@ -942,7 +951,11 @@ export default {
         that.canvas.add(oImg);
         //that.canvas.saveState();
       });
-    }
+    },
+     freeDraw() {
+      this.canvas.isDrawingMode = true;
+      this.canvas.freeDrawingBrush.width = 5;
+     }
   }
 }
 </script>
