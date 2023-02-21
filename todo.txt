@@ -1,0 +1,2 @@
+- Add typescript, use 'vue add typescript'
+- convert files to ts
